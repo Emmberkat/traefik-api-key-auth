@@ -14,7 +14,7 @@ Add to your Traefik static configuration
 experimental:
   plugins:
     traefik-api-key-auth:
-      moduleName: "github.com/Septima/traefik-api-key-auth"
+      moduleName: "github.com/Emmberkat/traefik-api-key-auth"
       version: "v0.2.3"
 ```
 
@@ -22,7 +22,7 @@ experimental:
 
 ```toml
 [experimental.plugins.traefik-api-key-auth]
-  moduleName = "github.com/Septima/traefik-api-key-auth"
+  moduleName = "github.com/Emmberkat/traefik-api-key-auth"
   version = "v0.2.3"
 ```
 
@@ -31,7 +31,7 @@ experimental:
 Add to your startup args:
 
 ```sh
---experimental.plugins.traefik-api-key-auth.modulename=github.com/Septima/traefik-api-key-auth
+--experimental.plugins.traefik-api-key-auth.modulename=github.com/Emmberkat/traefik-api-key-auth
 --experimental.plugins.traefik-api-key-auth.version=v0.2.3
 ```
 
