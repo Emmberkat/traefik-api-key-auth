@@ -8,6 +8,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"bufio"
 )
 
 type Config struct {
@@ -20,6 +21,7 @@ type Config struct {
 	PathSegment               bool     `json:"pathSegment,omitempty"`
 	PermissiveMode            bool     `json:"permissiveMode,omitempty"`
 	Keys                      []string `json:"keys,omitempty"`
+	KeyFiles                  []string `json:"keyFiles,omitempty"`
 	RemoveHeadersOnSuccess    bool     `json:"removeHeadersOnSuccess,omitempty"`
 	InternalForwardHeaderName string   `json:"internalForwardHeaderName,omitempty"`
 	InternalErrorRoute        string   `json:"internalErrorRoute,omitempty"`
@@ -41,6 +43,7 @@ func CreateConfig() *Config {
 		PathSegment:               true,
 		PermissiveMode:            false,
 		Keys:                      make([]string, 0),
+		KeyFiles:                  make([]string, 0),
 		RemoveHeadersOnSuccess:    true,
 		InternalForwardHeaderName: "",
 		InternalErrorRoute:        "",
@@ -66,8 +69,28 @@ type KeyAuth struct {
 func New(ctx context.Context, next http.Handler, config *Config, name string) (http.Handler, error) {
 	fmt.Printf("Creating plugin: %s instance: %+v, ctx: %+v\n", name, *config, ctx)
 
+	keys := config.Keys
+
+	for _, keyFileName := range config.KeyFiles {
+		file, err := os.Open(keyFileName)
+		if err != nil {
+			return nil, err
+		}
+		defer file.Close()
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line := scanner.Text()
+			key = strings.TrimSpace(line)
+			if key != "" {
+				keys = append(keys, key)
+			}
+		}
+	}
+	
+
 	// check for empty keys
-	if len(config.Keys) == 0 {
+	if len(keys) == 0 {
 		return nil, fmt.Errorf("must specify at least one valid key")
 	}
 
